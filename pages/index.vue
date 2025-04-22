@@ -50,6 +50,11 @@
         </p>
       </NuxtLink>
     </div>
+    <VideoComponent
+      class="mt-10"
+      youtubeId="SSo_EIwHSd4"
+      poster="https://i.ytimg.com/vi/SSo_EIwHSd4/maxresdefault.jpg"
+    />
   </section>
 </template>
 
