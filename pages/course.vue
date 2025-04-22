@@ -1,31 +1,30 @@
 <template>
-  <section class="bg-[#0d1117] min-h-screen py-16 text-white">
-    <div class="container mx-auto px-4">
-      <h2 class="text-3xl font-bold mb-8 text-center">
+  <section class="bg-[#0d1117] min-h-screen text-white flex">
+    <aside class="w-full max-w-[300px] border-r border-gray-700 p-6 overflow-y-auto">
+      <h2 class="text-2xl font-bold mb-6 text-center">
         {{ language === 'en' ? 'Crypto Courses' : 'Курси з криптовалюти' }}
       </h2>
-      <div class="grid md:grid-cols-3 gap-6">
+      <div class="space-y-4">
         <div
           v-for="course in courses"
           :key="course.id"
-          class="bg-[#161b22] rounded-2xl shadow-lg overflow-hidden"
+          class="bg-[#161b22] rounded-xl shadow p-4 cursor-pointer hover:bg-[#1d222c] transition"
         >
           <img
             :src="course.image"
             :alt="getLocalizedValue(course, 'title', language)"
-            class="w-full h-40 object-cover"
+            class="w-full h-24 object-cover rounded mb-2"
           />
-          <div class="p-6">
-            <h3 class="text-xl font-semibold mb-2">
-              {{ getLocalizedValue(course, 'title', language) }}
-            </h3>
-            <p class="text-sm text-gray-400">
-              {{ getLocalizedValue(course, 'description', language) }}
-            </p>
-          </div>
+          <h3 class="text-base font-semibold">
+            {{ getLocalizedValue(course, 'title', language) }}
+          </h3>
         </div>
       </div>
-    </div>
+    </aside>
+
+    <main class="flex-1 p-8 overflow-y-auto">
+      <NuxtPage />
+    </main>
   </section>
 </template>
 

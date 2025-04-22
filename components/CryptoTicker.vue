@@ -8,8 +8,6 @@
           <span
             :class="coin.price_change_percentage_24h >= 0 ? 'text-green-400' : 'text-red-400'"
           >
-            <span v-if="coin.price_change_percentage_24h >= 0">⬆️</span>
-            <span v-else>⬇️</span>
             ${{ coin.current_price.toFixed(2) }} ({{ coin.price_change_percentage_24h.toFixed(1) }}%)
           </span>
         </span>
