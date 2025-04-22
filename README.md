@@ -1,75 +1,23 @@
-# Nuxt Minimal Starter
+# 🚀 Nuxt Crypto
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+A modern Nuxt 3 project built with the latest frontend technologies.  
+Includes real-time crypto prices, multilingual support, and clean component architecture.
 
-## Setup
+## 🧪 Tech Stack
 
-Make sure to install dependencies:
+- [Nuxt 3](https://nuxt.com) — modern Vue framework
+- [TypeScript](https://www.typescriptlang.org/) — type-safe development
+- [Tailwind CSS](https://tailwindcss.com/) — utility-first CSS framework
+- [PNPM](https://pnpm.io/) — blazing-fast package manager
+- [Axios](https://axios-http.com/) — HTTP requests
+- 💬 Global language switcher via `useLanguage()`
+- 📈 Live crypto ticker powered by CoinGecko API
+
+---
+
+## ⚙️ Setup
+
+Install dependencies:
 
 ```bash
-# npm
-npm install
-
-# pnpm
 pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
