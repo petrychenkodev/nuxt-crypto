@@ -114,6 +114,22 @@ import { ref, onMounted, computed } from "vue";
 import axios from "axios";
 import HireModal from "@/components/HireModal.vue";
 
+interface Coin {
+  id: string;
+  name: string;
+  image: string;
+  current_price: number;
+  price_change_percentage_24h: number;
+}
+
+interface TrendingCoin {
+  id: string;
+  name: string;
+  symbol: string;
+  thumb: string;
+  market_cap_rank: number;
+}
+
 const { language } = useLanguage();
 
 const translations = {
@@ -131,13 +147,13 @@ const translations = {
 
 const t = computed(() => translations[language.value]);
 
-const coins = ref([]);
-const trendingCoins = ref([]);
+const coins = ref<Coin[]>([]);
+const trendingCoins = ref<TrendingCoin[]>([]);
 const showModal = ref(false);
 
 const fetchTopCoins = async () => {
   try {
-    const res = await axios.get(
+    const res = await axios.get<Coin[]>(
       "https://api.coingecko.com/api/v3/coins/markets",
       {
         params: {
@@ -158,10 +174,8 @@ const fetchTopCoins = async () => {
 
 const fetchTrendingCoins = async () => {
   try {
-    const res = await axios.get(
-      "https://api.coingecko.com/api/v3/search/trending"
-    );
-    trendingCoins.value = res.data.coins.map((coin: any) => ({
+    const res = await axios.get("https://api.coingecko.com/api/v3/search/trending");
+    trendingCoins.value = res.data.coins.map((coin: any): TrendingCoin => ({
       id: coin.item.id,
       name: coin.item.name,
       symbol: coin.item.symbol,
