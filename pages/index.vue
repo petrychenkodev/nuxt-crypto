@@ -66,26 +66,33 @@
     <div
       class="grid sm:grid-cols-2 md:grid-cols-4 gap-6 max-w-6xl mx-auto mb-16"
     >
-      <div
+      <a
         v-for="coin in coins"
         :key="coin.id"
-        class="bg-[#161b22] p-4 rounded-xl shadow-md flex flex-col items-center"
+        :href="`https://www.coingecko.com/en/coins/${coin.id}`"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="group bg-[#161b22] p-4 rounded-xl shadow-md flex flex-col items-center transform transition-transform hover:scale-105 relative overflow-hidden ring-2 ring-transparent hover:ring-4 hover:ring-yellow-400 animate-border-glow"
       >
-        <img :src="coin.image" :alt="coin.name" class="w-12 h-12 mb-2" />
-        <h3 class="text-lg font-semibold">{{ coin.name }}</h3>
-        <p class="text-gray-400 text-sm">
+        <div
+          class="absolute inset-0 border-2 rounded-xl border-transparent group-hover:animate-border-color-wave pointer-events-none"
+        ></div>
+        <img :src="coin.image" :alt="coin.name" class="w-12 h-12 mb-2 z-10" />
+        <h3 class="text-lg font-semibold z-10">{{ coin.name }}</h3>
+        <p class="text-gray-400 text-sm z-10">
           ${{ coin.current_price.toFixed(2) }}
         </p>
         <p
-          :class="
+          :class="[
             coin.price_change_percentage_24h >= 0
               ? 'text-green-400'
-              : 'text-red-400'
-          "
+              : 'text-red-400',
+            'z-10',
+          ]"
         >
           {{ coin.price_change_percentage_24h.toFixed(2) }}%
         </p>
-      </div>
+      </a>
     </div>
     <BitcoinChart />
     <div v-if="trendingCoins.length" class="max-w-4xl mx-auto mb-16 mt-16">
@@ -174,14 +181,18 @@ const fetchTopCoins = async () => {
 
 const fetchTrendingCoins = async () => {
   try {
-    const res = await axios.get("https://api.coingecko.com/api/v3/search/trending");
-    trendingCoins.value = res.data.coins.map((coin: any): TrendingCoin => ({
-      id: coin.item.id,
-      name: coin.item.name,
-      symbol: coin.item.symbol,
-      thumb: coin.item.thumb,
-      market_cap_rank: coin.item.market_cap_rank,
-    }));
+    const res = await axios.get(
+      "https://api.coingecko.com/api/v3/search/trending"
+    );
+    trendingCoins.value = res.data.coins.map(
+      (coin: any): TrendingCoin => ({
+        id: coin.item.id,
+        name: coin.item.name,
+        symbol: coin.item.symbol,
+        thumb: coin.item.thumb,
+        market_cap_rank: coin.item.market_cap_rank,
+      })
+    );
   } catch (e) {
     console.error("Failed to fetch trending coins", e);
   }
@@ -207,6 +218,27 @@ onMounted(() => {
   100% {
     border-color: rgba(59, 130, 246, 0.4);
   }
+}
+@keyframes borderColorWave {
+  0% {
+    border-color: #facc15;
+  }
+  25% {
+    border-color: #4ade80;
+  }
+  50% {
+    border-color: #3b82f6;
+  }
+  75% {
+    border-color: #8b5cf6;
+  }
+  100% {
+    border-color: #facc15;
+  }
+}
+
+.group-hover\:animate-border-color-wave {
+  animation: borderColorWave 2s linear infinite;
 }
 
 .animate-glow {
