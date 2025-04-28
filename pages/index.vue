@@ -1,7 +1,10 @@
 <template>
   <section class="min-h-screen bg-[#0d1117] text-white px-6 py-16">
     <div class="text-center mb-16">
-      <NuxtLink to="/course" class="inline-block group mr-2">
+      <button
+        @click="showSignatureModal = true"
+        class="inline-block group mr-2"
+      >
         <div
           class="relative w-full max-w-[500px] aspect-video mx-auto rounded-xl overflow-hidden shadow-lg transform transition duration-300 group-hover:scale-105 group-hover:shadow-blue-500/50 animate-pulse-ring"
         >
@@ -17,7 +20,7 @@
         <p class="mt-3 text-2xl font-extrabold text-blue-400 animate-bounce">
           {{ t.button }}
         </p>
-      </NuxtLink>
+      </button>
       <NuxtLink to="/cryptomap" class="inline-block group">
         <div
           class="relative w-[500px] aspect-video mx-auto mt-8 rounded-xl overflow-hidden shadow-lg transform transition duration-300 group-hover:scale-105 group-hover:shadow-green-500/50 animate-pulse-ring"
@@ -113,6 +116,11 @@
     </div>
     <HireModal v-if="showModal" @close="handleModalClose" />
     <HumanCheckModal v-if="showHumanCheck" @success="handleHumanCheckSuccess" />
+    <SignatureModal
+      v-if="showSignatureModal"
+      @signed="goToCourses"
+      @close="showSignatureModal = false"
+    />
   </section>
 </template>
 
@@ -120,6 +128,7 @@
 import { useLanguage } from "@/composables/useLanguage";
 import { ref, onMounted, computed } from "vue";
 import axios from "axios";
+import { navigateTo } from "nuxt/app";
 import { Coin, TrendingCoin } from "@/types/crypto";
 
 const { language } = useLanguage();
@@ -208,6 +217,13 @@ const showHumanCheck = ref(false);
 const handleHumanCheckSuccess = () => {
   showHumanCheck.value = false;
   localStorage.setItem("humanCheckPassed", "true");
+};
+
+const showSignatureModal = ref(false);
+
+const goToCourses = () => {
+  showSignatureModal.value = false;
+  navigateTo("/course");
 };
 </script>
 
