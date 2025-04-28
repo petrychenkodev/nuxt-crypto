@@ -1,9 +1,13 @@
 <template>
   <section class="crypto-regulations bg-[#0d1117] text-white p-6 min-h-screen">
-    <h1 class="text-3xl font-bold text-center mb-6">🌍 Crypto Regulations by Country</h1>
+    <h1 class="text-3xl font-bold text-center mb-6">
+      🌍 Crypto Regulations by Country
+    </h1>
 
     <div v-if="isLoading" class="flex justify-center items-center h-64">
-      <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-16 w-16"></div>
+      <div
+        class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-16 w-16"
+      ></div>
     </div>
 
     <div v-else class="overflow-x-auto">
@@ -33,7 +37,8 @@
               <span
                 :class="{
                   'text-green-400': regulationStatus[country.cca2] === 'Legal',
-                  'text-yellow-400': regulationStatus[country.cca2] === 'Partially Legal',
+                  'text-yellow-400':
+                    regulationStatus[country.cca2] === 'Partially Legal',
                   'text-red-400': regulationStatus[country.cca2] === 'Illegal',
                 }"
               >
@@ -48,56 +53,47 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed } from "vue";
+import { Country } from "@/types/crypto";
 
-interface Country {
-  cca2: string
-  name: {
-    common: string
-  }
-  flags: {
-    png: string
-  }
-}
-
-const countries = ref<Country[]>([])
-const isLoading = ref(true)
+const countries = ref<Country[]>([]);
+const isLoading = ref(true);
 
 const regulationStatus: Record<string, string> = {
-  US: 'Partially Legal',
-  CN: 'Illegal',
-  CH: 'Legal',
-  UA: 'Legal',
-  JP: 'Legal',
-  SG: 'Legal',
-  DE: 'Legal',
-  IN: 'Partially Legal',
-  BR: 'Legal',
-}
+  US: "Partially Legal",
+  CN: "Illegal",
+  CH: "Legal",
+  UA: "Legal",
+  JP: "Legal",
+  SG: "Legal",
+  DE: "Legal",
+  IN: "Partially Legal",
+  BR: "Legal",
+};
 
 const filteredCountries = computed(() =>
   countries.value.filter((country) => regulationStatus[country.cca2])
-)
+);
 
 onMounted(async () => {
   try {
-    const response = await fetch('https://restcountries.com/v3.1/all')
+    const response = await fetch("https://restcountries.com/v3.1/all");
     if (!response.ok) {
-      throw new Error('Failed to fetch countries')
+      throw new Error("Failed to fetch countries");
     }
-    const data = await response.json()
-    countries.value = data
+    const data = await response.json();
+    countries.value = data;
   } catch (error) {
-    console.error('Error fetching countries:', error)
+    console.error("Error fetching countries:", error);
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
-})
+});
 </script>
 
 <style scoped>
 .crypto-regulations {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 table {

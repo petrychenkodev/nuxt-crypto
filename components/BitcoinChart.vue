@@ -28,7 +28,7 @@
       <g>
         <text
           v-for="tick in yTicks"
-          :key="tick"
+          :key="tick + '-text'"
           :y="getY(tick) - 5"
           x="5"
           fill="#9ca3af"
@@ -48,60 +48,54 @@
   </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      prices: [],
-      width: 600,
-      height: 300,
-      yTicksCount: 6,
-    };
-  },
-  computed: {
-    maxPrice() {
-      return Math.max(...this.prices);
-    },
-    minPrice() {
-      return Math.min(...this.prices);
-    },
-    yTicks() {
-      const step = (this.maxPrice - this.minPrice) / (this.yTicksCount - 1);
-      return Array.from(
-        { length: this.yTicksCount },
-        (_, i) => Math.round((this.minPrice + step * i) * 100) / 100
-      ).reverse();
-    },
-    points() {
-      const range = this.maxPrice - this.minPrice;
-      const stepX = this.width / (this.prices.length - 1);
-      return this.prices
-        .map((price, index) => {
-          const x = index * stepX;
-          const y =
-            this.height - ((price - this.minPrice) / range) * this.height;
-          return `${x},${y}`;
-        })
-        .join(" ");
-    },
-  },
-  methods: {
-    getY(value) {
-      const range = this.maxPrice - this.minPrice;
-      return this.height - ((value - this.minPrice) / range) * this.height;
-    },
-  },
-  mounted() {
-    fetch(
-      "https://min-api.cryptocompare.com/data/v2/histoday?fsym=BTC&tsym=USD&limit=30"
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        this.prices = data.Data.Data.map((entry) => entry.close);
-      })
-      .catch((e) => console.error("Fetch error:", e));
-  },
+<script setup lang="ts">
+import { ref, computed, onMounted } from "vue";
+
+const prices = ref<number[]>([]);
+const width = 600;
+const height = 300;
+const yTicksCount = 6;
+
+const maxPrice = computed(() => Math.max(...prices.value));
+const minPrice = computed(() => Math.min(...prices.value));
+
+const yTicks = computed(() => {
+  const step = (maxPrice.value - minPrice.value) / (yTicksCount - 1);
+  return Array.from(
+    { length: yTicksCount },
+    (_, i) => Math.round((minPrice.value + step * i) * 100) / 100
+  ).reverse();
+});
+
+const points = computed(() => {
+  const range = maxPrice.value - minPrice.value;
+  const stepX = width / (prices.value.length - 1);
+
+  return prices.value
+    .map((price, index) => {
+      const x = index * stepX;
+      const y = height - ((price - minPrice.value) / range) * height;
+      return `${x},${y}`;
+    })
+    .join(" ");
+});
+
+const getY = (value: number) => {
+  const range = maxPrice.value - minPrice.value;
+  return height - ((value - minPrice.value) / range) * height;
 };
+
+onMounted(async () => {
+  try {
+    const res = await fetch(
+      "https://min-api.cryptocompare.com/data/v2/histoday?fsym=BTC&tsym=USD&limit=30"
+    );
+    const data = await res.json();
+    prices.value = data.Data.Data.map((entry: any) => entry.close);
+  } catch (e) {
+    console.error("Fetch error:", e);
+  }
+});
 </script>
 
 <style scoped>

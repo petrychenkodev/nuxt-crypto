@@ -32,7 +32,7 @@
           ></div>
         </div>
         <p class="mt-3 text-2xl font-extrabold text-green-400 animate-bounce">
-          Explore Crypto Map 🌍
+          Explore Crypto Map
         </p>
       </NuxtLink>
     </div>
@@ -111,7 +111,8 @@
         </a>
       </div>
     </div>
-    <HireModal v-if="showModal" @close="showModal = false" />
+    <HireModal v-if="showModal" @close="handleModalClose" />
+    <HumanCheckModal v-if="showHumanCheck" @success="handleHumanCheckSuccess" />
   </section>
 </template>
 
@@ -119,23 +120,7 @@
 import { useLanguage } from "@/composables/useLanguage";
 import { ref, onMounted, computed } from "vue";
 import axios from "axios";
-import HireModal from "@/components/HireModal.vue";
-
-interface Coin {
-  id: string;
-  name: string;
-  image: string;
-  current_price: number;
-  price_change_percentage_24h: number;
-}
-
-interface TrendingCoin {
-  id: string;
-  name: string;
-  symbol: string;
-  thumb: string;
-  market_cap_rank: number;
-}
+import { Coin, TrendingCoin } from "@/types/crypto";
 
 const { language } = useLanguage();
 
@@ -198,13 +183,32 @@ const fetchTrendingCoins = async () => {
   }
 };
 
+const handleModalClose = () => {
+  showModal.value = false;
+  localStorage.setItem("hireModalShown", "true");
+};
+
 onMounted(() => {
+  const hireModalShown = localStorage.getItem("hireModalShown");
+  const humanCheckPassed = localStorage.getItem("humanCheckPassed");
+
+  if (hireModalShown !== "true") {
+    setTimeout(() => {
+      showModal.value = true;
+    }, 3000);
+  } else if (humanCheckPassed !== "true") {
+    showHumanCheck.value = true;
+  }
+
   fetchTopCoins();
   fetchTrendingCoins();
-  setTimeout(() => {
-    showModal.value = true;
-  }, 3000);
 });
+const showHumanCheck = ref(false);
+
+const handleHumanCheckSuccess = () => {
+  showHumanCheck.value = false;
+  localStorage.setItem("humanCheckPassed", "true");
+};
 </script>
 
 <style scoped>
