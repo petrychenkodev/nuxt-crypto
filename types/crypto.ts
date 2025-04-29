@@ -1,5 +1,3 @@
-// types/crypto.ts
-
 export interface Coin {
     id: string;
     name: string;
@@ -25,3 +23,19 @@ export interface Country {
         png: string;
     };
 }
+export interface LessonVideo {
+    youtubeId?: string;
+    src?: string;
+    poster?: string;
+  }
+  
+  export interface LessonContent {
+    title: string;
+    description: string;
+    image: string;
+    benefitsTitle: string;
+    benefits: string[];
+    resourcesTitle: string;
+    resources: { url: string; label: string }[];
+    video: LessonVideo;
+  }
