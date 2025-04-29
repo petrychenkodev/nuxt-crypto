@@ -54,7 +54,9 @@
     </div>
 
     <div v-else class="text-center py-8">
-      <p class="text-red-400">Failed to load chart data. Too many requests. Please wait a moment and try again. This is a free API and has a request limit.
+      <p class="text-red-400">
+        Failed to load chart data. Too many requests. Please wait a moment and
+        try again. This is a free API and has a request limit.
       </p>
     </div>
   </div>
@@ -74,13 +76,49 @@ const width = 600;
 const height = 300;
 const yTicksCount = 6;
 
-const maxPrice = computed(() => (prices.value.length ? Math.max(...prices.value) : 0));
-const minPrice = computed(() => (prices.value.length ? Math.min(...prices.value) : 0));
+const getCachedData = <T = any>(
+  key: string,
+  maxAgeSeconds: number
+): T | null => {
+  const item = localStorage.getItem(key);
+  if (!item) return null;
+
+  try {
+    const { timestamp, data } = JSON.parse(item);
+    const now = Date.now();
+    if (now - timestamp > maxAgeSeconds * 1000) {
+      return null;
+    }
+    return data as T;
+  } catch {
+    return null;
+  }
+};
+
+const setCachedData = (key: string, data: unknown) => {
+  localStorage.setItem(
+    key,
+    JSON.stringify({
+      timestamp: Date.now(),
+      data,
+    })
+  );
+};
+
+const maxPrice = computed(() =>
+  prices.value.length ? Math.max(...prices.value) : 0
+);
+const minPrice = computed(() =>
+  prices.value.length ? Math.min(...prices.value) : 0
+);
 
 const yTicks = computed(() => {
   if (prices.value.length === 0) return [];
   const step = (maxPrice.value - minPrice.value) / (yTicksCount - 1);
-  return Array.from({ length: yTicksCount }, (_, i) => Math.round((minPrice.value + step * i) * 100) / 100).reverse();
+  return Array.from(
+    { length: yTicksCount },
+    (_, i) => Math.round((minPrice.value + step * i) * 100) / 100
+  ).reverse();
 });
 
 const points = computed(() => {
@@ -105,10 +143,25 @@ const getY = (value: number) => {
 const fetchPrices = async () => {
   loading.value = true;
   prices.value = [];
+
+  const cacheKey = `prices_${props.coinId}`;
+  const cached = getCachedData<number[]>(cacheKey, 120);
+
+  if (cached) {
+    prices.value = cached;
+    loading.value = false;
+    return;
+  }
+
   try {
-    const res = await fetch(`https://api.coingecko.com/api/v3/coins/${props.coinId}/market_chart?vs_currency=usd&days=30`);
+    const res = await fetch(
+      `https://api.coingecko.com/api/v3/coins/${props.coinId}/market_chart?vs_currency=usd&days=30`
+    );
     const data = await res.json();
-    prices.value = data.prices.map((p: [number, number]) => p[1]).filter(p => typeof p === 'number' && !isNaN(p));
+    prices.value = data.prices
+      .map((p: [number, number]) => p[1])
+      .filter((p) => typeof p === "number" && !isNaN(p));
+    setCachedData(cacheKey, prices.value);
   } catch (e) {
     console.error("Error loading prices:", e);
   } finally {
@@ -117,7 +170,6 @@ const fetchPrices = async () => {
 };
 
 onMounted(fetchPrices);
-
 watch(() => props.coinId, fetchPrices);
 </script>
 

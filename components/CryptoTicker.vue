@@ -28,10 +28,19 @@
 import { ref, onMounted } from "vue";
 import axios from "axios";
 import { Coin } from "@/types/crypto";
+import { getCachedData, setCachedData } from "@/utils/cache";
 
 const coins = ref<Coin[]>([]);
+const CACHE_KEY = "tickerCoins";
+const CACHE_DURATION_MS = 5 * 60 * 1000;
 
 const fetchCryptoPrices = async () => {
+  const cached = getCachedData<Coin[]>(CACHE_KEY, CACHE_DURATION_MS);
+  if (cached) {
+    coins.value = cached;
+    return;
+  }
+
   try {
     const res = await axios.get(
       "https://api.coingecko.com/api/v3/coins/markets",
@@ -47,9 +56,10 @@ const fetchCryptoPrices = async () => {
       }
     );
     coins.value = res.data;
+    setCachedData(CACHE_KEY, res.data);
   } catch (error) {
     console.error(
-      "Too many requests. Please wait a moment and try again. This is a free API and has a request limit.",
+      "❌ Too many requests. Please wait and try again later.",
       error
     );
   }

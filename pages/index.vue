@@ -1,6 +1,5 @@
 <template>
   <section class="min-h-screen bg-[#0d1117] text-white px-6 py-16">
-    <!-- Кнопки нагорі -->
     <div class="text-center mb-16">
       <button
         @click="showSignatureModal = true"
@@ -42,7 +41,6 @@
       </NuxtLink>
     </div>
 
-    <!-- NFT секція -->
     <div class="text-center mb-16">
       <NuxtLink to="/nftgallery" class="inline-block group">
         <div
@@ -63,13 +61,11 @@
       </NuxtLink>
     </div>
 
-    <!-- Заголовок -->
     <div class="max-w-3xl mx-auto text-center mb-12">
       <h1 class="text-4xl md:text-5xl font-bold mb-4">{{ t.title }}</h1>
       <p class="text-lg text-gray-400">{{ t.subtitle }}</p>
     </div>
 
-    <!-- Топ-коіни -->
     <div
       class="grid sm:grid-cols-2 md:grid-cols-4 gap-6 max-w-6xl mx-auto mb-16"
     >
@@ -100,14 +96,12 @@
       </NuxtLink>
     </div>
 
-    <!-- CryptoChart -->
     <CryptoChart
       :coin-id="'bitcoin'"
       title="Bitcoin 30 Days Chart"
       class="mb-16"
     />
 
-    <!-- Trending монети -->
     <div v-if="trendingCoins.length" class="max-w-4xl mx-auto mb-16 mt-16">
       <h2 class="text-2xl font-bold mb-4 text-center">🔥 Trending Now</h2>
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
@@ -124,7 +118,6 @@
       </div>
     </div>
 
-    <!-- Модальні вікна -->
     <HireModal v-if="showModal" @close="handleModalClose" />
     <HumanCheckModal v-if="showHumanCheck" @success="handleHumanCheckSuccess" />
     <SignatureModal
@@ -142,6 +135,32 @@ import axios from "axios";
 import { navigateTo } from "nuxt/app";
 import { Coin, TrendingCoin } from "@/types/crypto";
 import CryptoChart from "@/components/CryptoChart.vue";
+
+const getCachedData = (key: string, maxAgeSeconds: number) => {
+  const item = localStorage.getItem(key);
+  if (!item) return null;
+
+  try {
+    const { timestamp, data } = JSON.parse(item);
+    const now = Date.now();
+    if (now - timestamp > maxAgeSeconds * 1000) {
+      return null;
+    }
+    return data;
+  } catch {
+    return null;
+  }
+};
+
+const setCachedData = (key: string, data: any) => {
+  localStorage.setItem(
+    key,
+    JSON.stringify({
+      timestamp: Date.now(),
+      data,
+    })
+  );
+};
 
 const { language } = useLanguage();
 
@@ -167,6 +186,12 @@ const showHumanCheck = ref(false);
 const showSignatureModal = ref(false);
 
 const fetchTopCoins = async () => {
+  const cached = getCachedData<Coin[]>("topCoins", 300);
+  if (cached) {
+    coins.value = cached;
+    return;
+  }
+
   try {
     const res = await axios.get<Coin[]>(
       "https://api.coingecko.com/api/v3/coins/markets",
@@ -182,6 +207,7 @@ const fetchTopCoins = async () => {
       }
     );
     coins.value = res.data;
+    setCachedData("topCoins", res.data);
   } catch (e) {
     console.error(
       "Too many requests. Please wait a moment and try again. This is a free API and has a request limit."
@@ -190,11 +216,17 @@ const fetchTopCoins = async () => {
 };
 
 const fetchTrendingCoins = async () => {
+  const cached = getCachedData<TrendingCoin[]>("trendingCoins", 300);
+  if (cached) {
+    trendingCoins.value = cached;
+    return;
+  }
+
   try {
     const res = await axios.get(
       "https://api.coingecko.com/api/v3/search/trending"
     );
-    trendingCoins.value = res.data.coins.map(
+    const mapped = res.data.coins.map(
       (coin: any): TrendingCoin => ({
         id: coin.item.id,
         name: coin.item.name,
@@ -203,6 +235,8 @@ const fetchTrendingCoins = async () => {
         market_cap_rank: coin.item.market_cap_rank,
       })
     );
+    trendingCoins.value = mapped;
+    setCachedData("trendingCoins", mapped);
   } catch (e) {
     console.error(
       "Too many requests. Please wait a moment and try again. This is a free API and has a request limit."

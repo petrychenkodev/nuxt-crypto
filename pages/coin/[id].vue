@@ -67,21 +67,78 @@
 
 <script setup lang="ts">
 import { useRoute } from "vue-router";
-import { useFetch } from "nuxt/app";
-import { computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import type { CoinDetails } from "@/types/crypto";
+
+const getCachedData = <T = any>(
+  key: string,
+  maxAgeSeconds: number
+): T | null => {
+  const item = localStorage.getItem(key);
+  if (!item) return null;
+
+  try {
+    const { timestamp, data } = JSON.parse(item);
+    const now = Date.now();
+    if (now - timestamp > maxAgeSeconds * 1000) {
+      return null;
+    }
+    return data as T;
+  } catch {
+    return null;
+  }
+};
+
+const setCachedData = (key: string, data: unknown) => {
+  localStorage.setItem(
+    key,
+    JSON.stringify({
+      timestamp: Date.now(),
+      data,
+    })
+  );
+};
 
 const route = useRoute();
 const id = route.params.id as string;
 
-const {
-  data: coin,
-  pending,
-  error,
-} = await useFetch<CoinDetails>(`https://api.coingecko.com/api/v3/coins/${id}`);
+const coin = ref<CoinDetails | null>(null);
+const pending = ref(true);
+const error = ref(false);
 
 const formattedDescription = computed(() => {
   if (!coin.value?.description?.en) return "";
   return coin.value.description.en.replace(/<\/?[^>]+(>|$)/g, "");
 });
+
+const fetchCoinDetails = async () => {
+  pending.value = true;
+  error.value = false;
+
+  const cacheKey = `coin_${id}`;
+  const cached = getCachedData<CoinDetails>(cacheKey, 300);
+
+  if (cached) {
+    coin.value = cached;
+    pending.value = false;
+    return;
+  }
+
+  try {
+    const res = await fetch(`https://api.coingecko.com/api/v3/coins/${id}`);
+    if (!res.ok) {
+      throw new Error(`HTTP error! Status: ${res.status}`);
+    }
+    const data = await res.json();
+    coin.value = data;
+    setCachedData(cacheKey, data);
+  } catch (e) {
+    console.error("Failed to fetch coin details:", e);
+    error.value = true;
+  } finally {
+    pending.value = false;
+  }
+};
+
+onMounted(fetchCoinDetails);
 </script>
