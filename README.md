@@ -31,3 +31,12 @@ Install dependencies:
 
 ```bash
 pnpm install
+
+```bash
+pnpm dev
+
+```bash
+pnpm build
+
+```bash
+pnpm preview
