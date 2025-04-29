@@ -3,7 +3,7 @@
     <aside
       class="w-full max-w-[300px] border-r border-gray-700 p-6 overflow-y-auto"
     >
-      <h2 class="text-2xl font-bold mb-6 text-center">
+      <h2 class="text-2xl font-bold mb-6 mt-4 text-center">
         {{ language === "en" ? "Crypto Courses" : "Курси з криптовалюти" }}
       </h2>
       <div class="space-y-4">

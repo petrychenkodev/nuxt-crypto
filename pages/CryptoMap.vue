@@ -1,6 +1,6 @@
 <template>
   <section class="crypto-regulations bg-[#0d1117] text-white p-6 min-h-screen">
-    <h1 class="text-3xl font-bold text-center mb-6">
+    <h1 class="text-3xl font-bold text-center mb-6 mt-4">
       🌍 Crypto Regulations by Country
     </h1>
 
