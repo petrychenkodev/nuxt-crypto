@@ -16,16 +16,17 @@
       class="grid sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl mx-auto"
     >
       <div
-        v-for="(img, index) in dogImages"
+        v-for="(dog, index) in dogData"
         :key="index"
         class="bg-[#161b22] rounded-xl overflow-hidden shadow-lg transition transform hover:scale-105 hover:shadow-blue-500/50"
       >
-        <img :src="img" alt="Dog Image" class="w-full h-60 object-cover" />
+        <img :src="dog.image" alt="Dog Image" class="w-full h-60 object-cover" />
         <div class="p-4">
-          <h2 class="text-xl font-semibold mb-1">Random Dog</h2>
-          <p class="text-sm text-gray-300">
-            Here's a new furry friend from the Dog API!
+          <h2 class="text-xl font-semibold mb-1">{{ dog.name }}</h2>
+          <p class="text-sm text-gray-300 mb-2">
+            {{ dog.description }}
           </p>
+          <p class="text-lg font-bold text-green-400">{{ dog.price }} ETH</p>
         </div>
       </div>
     </div>
@@ -35,6 +36,26 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import axios from "axios";
+
+const randomDescriptions = [
+  "Playful Pup",
+  "Sassy Doggo",
+  "Chill Woof",
+  "Explorer Doggo",
+  "Sleepy Snout",
+  "Adventurous Tail",
+  "Loyal Companion",
+  "Funny Sniffer",
+];
+
+const getRandomPrice = () => {
+  return (Math.random() * 0.49 + 0.01).toFixed(2); // ціна від 0.01 до 0.5 ETH
+};
+
+const getRandomDescription = () => {
+  const randomIndex = Math.floor(Math.random() * randomDescriptions.length);
+  return randomDescriptions[randomIndex];
+};
 
 const getCachedData = <T = any>(
   key: string,
@@ -65,22 +86,35 @@ const setCachedData = (key: string, data: unknown) => {
   );
 };
 
-const dogImages = ref<string[]>([]);
+interface Dog {
+  image: string;
+  price: string;
+  name: string;
+  description: string;
+}
+
+const dogData = ref<Dog[]>([]);
 const loading = ref(true);
 
 const fetchDogImages = async () => {
-  const cached = getCachedData<string[]>("dogImages", 300);
+  const cached = getCachedData<Dog[]>("dogData", 300);
 
   if (cached) {
-    dogImages.value = cached;
+    dogData.value = cached;
     loading.value = false;
     return;
   }
 
   try {
     const res = await axios.get("https://dog.ceo/api/breeds/image/random/6");
-    dogImages.value = res.data.message;
-    setCachedData("dogImages", dogImages.value);
+    dogData.value = res.data.message.map((img: string) => ({
+      image: img,
+      price: getRandomPrice(),
+      name: "Random Dog",
+      description: getRandomDescription(),
+    }));
+
+    setCachedData("dogData", dogData.value);
   } catch (err) {
     console.error(
       "Too many requests. Please wait a moment and try again. This is a free API and has a request limit."

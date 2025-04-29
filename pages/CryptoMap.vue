@@ -3,6 +3,25 @@
     <h1 class="text-3xl font-bold text-center mb-6 mt-4">
       🌍 Crypto Regulations by Country
     </h1>
+    <div
+      class="flex flex-col md:flex-row items-center gap-4 mb-8 justify-center"
+    >
+      <input
+        v-model="searchQuery"
+        type="text"
+        placeholder="🔍 Search country..."
+        class="px-4 py-2 rounded bg-[#161b22] border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 w-72"
+      />
+      <select
+        v-model="selectedStatus"
+        class="px-4 py-2 rounded bg-[#161b22] border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 w-72"
+      >
+        <option value="">🌎 All Statuses</option>
+        <option value="Legal">✅ Legal</option>
+        <option value="Partially Legal">⚖️ Partially Legal</option>
+        <option value="Illegal">🚫 Illegal</option>
+      </select>
+    </div>
 
     <div v-if="isLoading" class="flex justify-center items-center h-64">
       <div
@@ -58,6 +77,8 @@ import { Country } from "@/types/crypto";
 
 const countries = ref<Country[]>([]);
 const isLoading = ref(true);
+const searchQuery = ref("");
+const selectedStatus = ref("");
 
 const regulationStatus: Record<string, string> = {
   US: "Partially Legal",
@@ -71,15 +92,27 @@ const regulationStatus: Record<string, string> = {
   BR: "Legal",
 };
 
-const filteredCountries = computed(() =>
-  countries.value.filter((country) => regulationStatus[country.cca2])
-);
+const filteredCountries = computed(() => {
+  return countries.value.filter((country) => {
+    const status = regulationStatus[country.cca2];
+    const matchesStatus = selectedStatus.value
+      ? status === selectedStatus.value
+      : true;
+    const matchesSearch = country.name.common
+      .toLowerCase()
+      .includes(searchQuery.value.toLowerCase());
+
+    return status && matchesStatus && matchesSearch;
+  });
+});
 
 onMounted(async () => {
   try {
     const response = await fetch("https://restcountries.com/v3.1/all");
     if (!response.ok) {
-      throw new Error("Too many requests. Please wait a moment and try again. This is a free API and has a request limit.");
+      throw new Error(
+        "Too many requests. Please wait a moment and try again. This is a free API and has a request limit."
+      );
     }
     const data = await response.json();
     countries.value = data;
@@ -95,7 +128,6 @@ onMounted(async () => {
 .crypto-regulations {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
-
 table {
   border-collapse: collapse;
   width: 100%;
@@ -107,12 +139,10 @@ td,
 th {
   padding: 12px 15px;
 }
-
 .loader {
   border-top-color: #3b82f6;
   animation: spin 1s linear infinite;
 }
-
 @keyframes spin {
   0% {
     transform: rotate(0);
