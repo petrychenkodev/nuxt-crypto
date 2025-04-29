@@ -14,6 +14,7 @@
     </header>
 
     <NuxtPage />
+    <ChatBot />
     <Footer />
   </div>
 </template>
