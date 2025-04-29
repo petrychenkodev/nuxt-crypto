@@ -158,9 +158,9 @@ const fetchPrices = async () => {
       `https://api.coingecko.com/api/v3/coins/${props.coinId}/market_chart?vs_currency=usd&days=30`
     );
     const data = await res.json();
-    prices.value = data.prices
-      .map((p: [number, number]) => p[1])
-      .filter((p) => typeof p === "number" && !isNaN(p));
+    prices.value = (data.prices as [number, number][])
+      .map((p) => p[1])
+      .filter((p): p is number => typeof p === "number" && !isNaN(p));
     setCachedData(cacheKey, prices.value);
   } catch (e) {
     console.error("Error loading prices:", e);

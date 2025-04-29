@@ -136,7 +136,7 @@ import { navigateTo } from "nuxt/app";
 import { Coin, TrendingCoin } from "@/types/crypto";
 import CryptoChart from "@/components/CryptoChart.vue";
 
-const getCachedData = (key: string, maxAgeSeconds: number) => {
+const getCachedData = <T>(key: string, maxAgeSeconds: number): T | null => {
   const item = localStorage.getItem(key);
   if (!item) return null;
 
@@ -146,7 +146,7 @@ const getCachedData = (key: string, maxAgeSeconds: number) => {
     if (now - timestamp > maxAgeSeconds * 1000) {
       return null;
     }
-    return data;
+    return data as T;
   } catch {
     return null;
   }
