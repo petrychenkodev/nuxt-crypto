@@ -79,7 +79,7 @@ onMounted(async () => {
   try {
     const response = await fetch("https://restcountries.com/v3.1/all");
     if (!response.ok) {
-      throw new Error("Failed to fetch countries");
+      throw new Error("Too many requests. Please wait a moment and try again. This is a free API and has a request limit.");
     }
     const data = await response.json();
     countries.value = data;

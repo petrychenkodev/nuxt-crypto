@@ -1,6 +1,6 @@
 <template>
   <div class="chart-container">
-    <h2 class="text-xl font-bold mb-4">📈 Bitcoin 30 days SVG chart</h2>
+    <h2 class="text-xl font-bold mb-4">{{ title }}</h2>
     <svg :width="width" :height="height" class="chart-svg">
       <rect
         x="0"
@@ -49,7 +49,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
+
+const props = defineProps<{
+  coinId: string;
+  title: string;
+}>();
 
 const prices = ref<number[]>([]);
 const width = 600;
@@ -85,16 +90,24 @@ const getY = (value: number) => {
   return height - ((value - minPrice.value) / range) * height;
 };
 
-onMounted(async () => {
+const fetchPrices = async () => {
   try {
     const res = await fetch(
-      "https://min-api.cryptocompare.com/data/v2/histoday?fsym=BTC&tsym=USD&limit=30"
+      `https://api.coingecko.com/api/v3/coins/${props.coinId}/market_chart?vs_currency=usd&days=30`
     );
     const data = await res.json();
-    prices.value = data.Data.Data.map((entry: any) => entry.close);
+    prices.value = data.prices.map((p: [number, number]) => p[1]);
   } catch (e) {
-    console.error("Fetch error:", e);
+    console.error("Error loading prices:", e);
   }
+};
+
+onMounted(() => {
+  fetchPrices();
+});
+
+watch(() => props.coinId, () => {
+  fetchPrices();
 });
 </script>
 

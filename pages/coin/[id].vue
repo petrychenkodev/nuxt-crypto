@@ -1,0 +1,87 @@
+<template>
+  <section class="min-h-screen bg-[#0d1117] text-white px-6 py-12">
+    <div v-if="pending" class="text-center py-20">
+      <p class="text-lg animate-pulse">Loading coin data...</p>
+    </div>
+
+    <div v-else-if="error" class="text-center py-20">
+      <p class="text-red-400 text-lg">
+        Too many requests. Please wait a moment and try again. This is a free
+        API and has a request limit.
+      </p>
+    </div>
+
+    <div v-else-if="coin" class="max-w-4xl mx-auto">
+      <div class="flex items-center gap-4 mb-8">
+        <img :src="coin.image?.large" :alt="coin.name" class="w-16 h-16" />
+        <div>
+          <h1 class="text-4xl font-bold">
+            {{ coin.name }} ({{ coin.symbol.toUpperCase() }})
+          </h1>
+          <p class="text-gray-400">Rank #{{ coin.market_cap_rank }}</p>
+        </div>
+      </div>
+
+      <div class="mb-8">
+        <h2 class="text-2xl font-bold mb-2">Current Price</h2>
+        <p class="text-3xl font-bold text-green-400">
+          ${{ coin.market_data?.current_price?.usd?.toLocaleString() }}
+        </p>
+      </div>
+
+      <div class="mb-8">
+        <h2 class="text-2xl font-bold mb-2">Market Cap</h2>
+        <p class="text-lg text-gray-300">
+          ${{ coin.market_data?.market_cap?.usd?.toLocaleString() }}
+        </p>
+      </div>
+
+      <div v-if="coin.description?.en" class="mb-8">
+        <h2 class="text-2xl font-bold mb-2">About {{ coin.name }}</h2>
+        <p
+          class="text-gray-300 leading-relaxed"
+          v-html="formattedDescription"
+        ></p>
+      </div>
+
+      <div v-if="coin.links?.homepage?.[0]" class="mt-8">
+        <h2 class="text-2xl font-bold mb-2">Official Website</h2>
+        <a
+          :href="coin.links.homepage[0]"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-blue-400 underline"
+        >
+          {{ coin.links.homepage[0] }}
+        </a>
+      </div>
+
+      <CryptoChart
+        v-if="id && coin"
+        :coinId="id"
+        :title="`${coin.name} Price (30 Days)`"
+      />
+    </div>
+  </section>
+</template>
+
+<script setup lang="ts">
+import { useRoute } from "vue-router";
+import { useFetch } from "nuxt/app";
+import { computed } from "vue";
+import type { CoinDetails } from "@/types/crypto";
+
+const route = useRoute();
+const id = route.params.id as string;
+
+const {
+  data: coin,
+  pending,
+  error,
+} = await useFetch<CoinDetails>(`https://api.coingecko.com/api/v3/coins/${id}`);
+
+const formattedDescription = computed(() => {
+  if (!coin.value?.description?.en) return "";
+  return coin.value.description.en.replace(/<\/?[^>]+(>|$)/g, "");
+});
+</script>

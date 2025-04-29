@@ -48,7 +48,10 @@ const fetchCryptoPrices = async () => {
     );
     coins.value = res.data;
   } catch (error) {
-    console.error("Failed to fetch crypto prices:", error);
+    console.error(
+      "Too many requests. Please wait a moment and try again. This is a free API and has a request limit.",
+      error
+    );
   }
 };
 

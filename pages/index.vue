@@ -1,17 +1,18 @@
 <template>
   <section class="min-h-screen bg-[#0d1117] text-white px-6 py-16">
+    <!-- Кнопки нагорі -->
     <div class="text-center mb-16">
       <button
         @click="showSignatureModal = true"
         class="inline-block group mr-2"
       >
         <div
-          class="relative w-full max-w-[500px] aspect-video mx-auto rounded-xl overflow-hidden shadow-lg transform transition duration-300 group-hover:scale-105 group-hover:shadow-blue-500/50 animate-pulse-ring"
+          class="relative w-full max-w-[500px] aspect-video mx-auto rounded-xl overflow-hidden shadow-lg transform transition group-hover:scale-105 group-hover:shadow-blue-500/50 animate-pulse-ring"
         >
           <img
             src="https://assets.finbold.com/uploads/2024/05/Crypto-trader-turns-800-into-657000-in-5-hours.jpg"
             alt="Go to courses"
-            class="w-full h-full object-cover group-hover:opacity-90 transition duration-300"
+            class="w-full h-full object-cover group-hover:opacity-90 transition"
           />
           <div
             class="absolute inset-0 border-4 border-blue-400/70 rounded-xl animate-glow pointer-events-none"
@@ -21,14 +22,15 @@
           {{ t.button }}
         </p>
       </button>
+
       <NuxtLink to="/cryptomap" class="inline-block group">
         <div
-          class="relative w-[500px] aspect-video mx-auto mt-8 rounded-xl overflow-hidden shadow-lg transform transition duration-300 group-hover:scale-105 group-hover:shadow-green-500/50 animate-pulse-ring"
+          class="relative w-[500px] aspect-video mx-auto mt-8 rounded-xl overflow-hidden shadow-lg transform transition group-hover:scale-105 group-hover:shadow-green-500/50 animate-pulse-ring"
         >
           <img
             src="https://www.chainalysis.com/wp-content/uploads/2021/11/611c545f846ca6503248f2cd-chainalysis-map-copy-min-3.png"
             alt="Crypto Map"
-            class="w-full h-full object-cover group-hover:opacity-90 transition duration-300"
+            class="w-full h-full object-cover group-hover:opacity-90 transition"
           />
           <div
             class="absolute inset-0 border-4 border-green-400/70 rounded-xl animate-glow pointer-events-none"
@@ -39,43 +41,43 @@
         </p>
       </NuxtLink>
     </div>
+
+    <!-- NFT секція -->
     <div class="text-center mb-16">
       <NuxtLink to="/nftgallery" class="inline-block group">
         <div
-          class="relative w-full max-w-[500px] aspect-video mx-auto rounded-xl overflow-hidden shadow-lg transform transition duration-300 group-hover:scale-105 group-hover:shadow-purple-500/50 animate-pulse-ring"
+          class="relative w-full max-w-[500px] aspect-video mx-auto rounded-xl overflow-hidden shadow-lg transform transition group-hover:scale-105 group-hover:shadow-purple-500/50 animate-pulse-ring"
         >
           <img
             src="https://dan-it.com.ua/wp-content/uploads/2024/10/nft.jpg"
             alt="Go to NFT Gallery"
-            class="w-full h-full object-cover group-hover:opacity-90 transition duration-300"
+            class="w-full h-full object-cover group-hover:opacity-90 transition"
           />
           <div
             class="absolute inset-0 border-4 border-purple-400/70 rounded-xl animate-glow pointer-events-none"
           ></div>
         </div>
-        <p
-          class="mt-3 text-2xl font-extrabold text-purple-400 group-hover:text-purple-300 transition duration-300 animate-bounce"
-        >
+        <p class="mt-3 text-2xl font-extrabold text-purple-400 animate-bounce">
           Explore NFT Gallery
         </p>
       </NuxtLink>
     </div>
 
+    <!-- Заголовок -->
     <div class="max-w-3xl mx-auto text-center mb-12">
       <h1 class="text-4xl md:text-5xl font-bold mb-4">{{ t.title }}</h1>
       <p class="text-lg text-gray-400">{{ t.subtitle }}</p>
     </div>
 
+    <!-- Топ-коіни -->
     <div
       class="grid sm:grid-cols-2 md:grid-cols-4 gap-6 max-w-6xl mx-auto mb-16"
     >
-      <a
+      <NuxtLink
         v-for="coin in coins"
         :key="coin.id"
-        :href="`https://www.coingecko.com/en/coins/${coin.id}`"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="group bg-[#161b22] p-4 rounded-xl shadow-md flex flex-col items-center transform transition-transform hover:scale-105 relative overflow-hidden ring-2 ring-transparent hover:ring-4 hover:ring-yellow-400 animate-border-glow"
+        :to="`/coin/${coin.id}`"
+        class="group bg-[#161b22] p-4 rounded-xl shadow-md flex flex-col items-center transform transition hover:scale-105 relative overflow-hidden ring-2 ring-transparent hover:ring-4 hover:ring-yellow-400 animate-border-glow"
       >
         <div
           class="absolute inset-0 border-2 rounded-xl border-transparent group-hover:animate-border-color-wave pointer-events-none"
@@ -95,25 +97,34 @@
         >
           {{ coin.price_change_percentage_24h.toFixed(2) }}%
         </p>
-      </a>
+      </NuxtLink>
     </div>
-    <BitcoinChart />
+
+    <!-- CryptoChart -->
+    <CryptoChart
+      :coin-id="'bitcoin'"
+      title="Bitcoin 30 Days Chart"
+      class="mb-16"
+    />
+
+    <!-- Trending монети -->
     <div v-if="trendingCoins.length" class="max-w-4xl mx-auto mb-16 mt-16">
       <h2 class="text-2xl font-bold mb-4 text-center">🔥 Trending Now</h2>
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
-        <a
+        <NuxtLink
           v-for="trend in trendingCoins"
           :key="trend.id"
-          class="bg-[#161b22] rounded-xl p-3 flex flex-col items-center text-center transform transition-transform hover:scale-105 hover:ring-2 hover:ring-blue-500 cursor-pointer"
-          :href="`https://www.coingecko.com/en/coins/${trend.id}`"
-          target="_blank"
+          :to="`/coin/${trend.id}`"
+          class="bg-[#161b22] rounded-xl p-3 flex flex-col items-center text-center transform transition hover:scale-105 hover:ring-2 hover:ring-blue-500 cursor-pointer"
         >
           <img :src="trend.thumb" :alt="trend.name" class="w-10 h-10 mb-2" />
           <p class="text-sm font-semibold">{{ trend.name }}</p>
           <p class="text-xs text-gray-400">#{{ trend.market_cap_rank }}</p>
-        </a>
+        </NuxtLink>
       </div>
     </div>
+
+    <!-- Модальні вікна -->
     <HireModal v-if="showModal" @close="handleModalClose" />
     <HumanCheckModal v-if="showHumanCheck" @success="handleHumanCheckSuccess" />
     <SignatureModal
@@ -130,6 +141,7 @@ import { ref, onMounted, computed } from "vue";
 import axios from "axios";
 import { navigateTo } from "nuxt/app";
 import { Coin, TrendingCoin } from "@/types/crypto";
+import CryptoChart from "@/components/CryptoChart.vue";
 
 const { language } = useLanguage();
 
@@ -151,6 +163,8 @@ const t = computed(() => translations[language.value]);
 const coins = ref<Coin[]>([]);
 const trendingCoins = ref<TrendingCoin[]>([]);
 const showModal = ref(false);
+const showHumanCheck = ref(false);
+const showSignatureModal = ref(false);
 
 const fetchTopCoins = async () => {
   try {
@@ -169,7 +183,9 @@ const fetchTopCoins = async () => {
     );
     coins.value = res.data;
   } catch (e) {
-    console.error("Failed to fetch CoinGecko data", e);
+    console.error(
+      "Too many requests. Please wait a moment and try again. This is a free API and has a request limit."
+    );
   }
 };
 
@@ -188,13 +204,25 @@ const fetchTrendingCoins = async () => {
       })
     );
   } catch (e) {
-    console.error("Failed to fetch trending coins", e);
+    console.error(
+      "Too many requests. Please wait a moment and try again. This is a free API and has a request limit."
+    );
   }
 };
 
 const handleModalClose = () => {
   showModal.value = false;
   localStorage.setItem("hireModalShown", "true");
+};
+
+const handleHumanCheckSuccess = () => {
+  showHumanCheck.value = false;
+  localStorage.setItem("humanCheckPassed", "true");
+};
+
+const goToCourses = () => {
+  showSignatureModal.value = false;
+  navigateTo("/course");
 };
 
 onMounted(() => {
@@ -212,19 +240,6 @@ onMounted(() => {
   fetchTopCoins();
   fetchTrendingCoins();
 });
-const showHumanCheck = ref(false);
-
-const handleHumanCheckSuccess = () => {
-  showHumanCheck.value = false;
-  localStorage.setItem("humanCheckPassed", "true");
-};
-
-const showSignatureModal = ref(false);
-
-const goToCourses = () => {
-  showSignatureModal.value = false;
-  navigateTo("/course");
-};
 </script>
 
 <style scoped>
@@ -260,7 +275,6 @@ const goToCourses = () => {
 .group-hover\:animate-border-color-wave {
   animation: borderColorWave 2s linear infinite;
 }
-
 .animate-glow {
   animation: glow 1.5s infinite;
 }

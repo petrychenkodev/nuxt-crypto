@@ -42,7 +42,7 @@
       const res = await axios.get('https://dog.ceo/api/breeds/image/random/6');
       dogImages.value = res.data.message;
     } catch (err) {
-      console.error('Failed to fetch dog images:', err);
+      console.error('Too many requests. Please wait a moment and try again. This is a free API and has a request limit.');
     } finally {
       loading.value = false;
     }
