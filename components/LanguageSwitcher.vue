@@ -27,7 +27,7 @@ watch(language, (newLang) => {
     <transition name="fade">
       <div
         v-if="showTooltip"
-        class="absolute top-12 right-0 bg-gray-800 text-white text-xs px-4 py-2 rounded shadow-md z-50 max-w-[calc(100vw-2rem)] w-64 text-center"
+        class="absolute z-[9999]  top-12 right-0 bg-gray-800 text-white text-xs px-4 py-2 rounded shadow-md z-50 max-w-[calc(100vw-2rem)] w-64 text-center"
       >
         Деякі тексти ще можуть бути без перекладу.<br />
         Some texts may not be fully translated yet.
