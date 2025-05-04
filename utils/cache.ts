@@ -1,20 +1,20 @@
-export const getCachedData = <T = any>(key: string, maxAgeSeconds: number): T | null => {
+export const getCachedData = <T = unknown>(key: string, maxAgeSeconds: number): T | null => {
   const item = localStorage.getItem(key);
   if (!item) return null;
 
   try {
-    const { timestamp, data } = JSON.parse(item);
+    const parsed = JSON.parse(item) as { timestamp: number; data: T };
     const now = Date.now();
-    if (now - timestamp > maxAgeSeconds * 1000) {
+    if (now - parsed.timestamp > maxAgeSeconds * 1000) {
       return null;
     }
-    return data as T;
+    return parsed.data;
   } catch {
     return null;
   }
 };
 
-export function setCachedData(key: string, data: any): void {
+export function setCachedData<T = any>(key: string, data: T): void {
   localStorage.setItem(key, JSON.stringify({
     timestamp: Date.now(),
     data

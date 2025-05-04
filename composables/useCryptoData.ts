@@ -1,4 +1,5 @@
 import { ref } from 'vue';
+import { setCachedData } from '@/utils/cache';
 import { Coin, TrendingCoin } from '@/types/crypto';
 
 const getCachedData = <T>(key: string, maxAgeSeconds: number): T | null => {
@@ -12,12 +13,6 @@ const getCachedData = <T>(key: string, maxAgeSeconds: number): T | null => {
   return data;
 };
 
-const setCachedData = (key: string, data: any) => {
-  localStorage.setItem(
-    key,
-    JSON.stringify({ timestamp: Date.now(), data })
-  );
-};
 
 export const useCryptoData = () => {
   const coins = ref<Coin[]>([]);

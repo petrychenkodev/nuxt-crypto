@@ -56,7 +56,7 @@ const fetchCryptoPrices = async () => {
       }
     );
     coins.value = res.data;
-    setCachedData(CACHE_KEY, res.data);
+    await setCachedData(CACHE_KEY, res.data);
   } catch (error) {
     console.error(
       "❌ Too many requests. Please wait and try again later.",

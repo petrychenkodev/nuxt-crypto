@@ -95,15 +95,7 @@ const getCachedData = <T = any>(
   }
 };
 
-const setCachedData = (key: string, data: unknown) => {
-  localStorage.setItem(
-    key,
-    JSON.stringify({
-      timestamp: Date.now(),
-      data,
-    })
-  );
-};
+import { setCachedData } from "@/utils/cache";
 
 const maxPrice = computed(() =>
   prices.value.length ? Math.max(...prices.value) : 0

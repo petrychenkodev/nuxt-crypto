@@ -20,7 +20,11 @@
         :key="index"
         class="bg-[#161b22] rounded-xl overflow-hidden shadow-lg transition transform hover:scale-105 hover:shadow-blue-500/50"
       >
-        <img :src="dog.image" alt="Dog Image" class="w-full h-60 object-cover" />
+        <img
+          :src="dog.image"
+          alt="Dog Image"
+          class="w-full h-60 object-cover"
+        />
         <div class="p-4">
           <h2 class="text-xl font-semibold mb-1">{{ dog.name }}</h2>
           <p class="text-sm text-gray-300 mb-2">
@@ -49,7 +53,7 @@ const randomDescriptions = [
 ];
 
 const getRandomPrice = () => {
-  return (Math.random() * 0.49 + 0.01).toFixed(2); // ціна від 0.01 до 0.5 ETH
+  return (Math.random() * 0.49 + 0.01).toFixed(2);
 };
 
 const getRandomDescription = () => {
@@ -57,34 +61,7 @@ const getRandomDescription = () => {
   return randomDescriptions[randomIndex];
 };
 
-const getCachedData = <T = any>(
-  key: string,
-  maxAgeSeconds: number
-): T | null => {
-  const item = localStorage.getItem(key);
-  if (!item) return null;
-
-  try {
-    const { timestamp, data } = JSON.parse(item);
-    const now = Date.now();
-    if (now - timestamp > maxAgeSeconds * 1000) {
-      return null;
-    }
-    return data as T;
-  } catch {
-    return null;
-  }
-};
-
-const setCachedData = (key: string, data: unknown) => {
-  localStorage.setItem(
-    key,
-    JSON.stringify({
-      timestamp: Date.now(),
-      data,
-    })
-  );
-};
+import { getCachedData, setCachedData } from "@/utils/cache";
 
 interface Dog {
   image: string;

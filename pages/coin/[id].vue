@@ -69,35 +69,7 @@
 import { useRoute } from "vue-router";
 import { ref, computed, onMounted } from "vue";
 import type { CoinDetails } from "@/types/crypto";
-
-const getCachedData = <T = any>(
-  key: string,
-  maxAgeSeconds: number
-): T | null => {
-  const item = localStorage.getItem(key);
-  if (!item) return null;
-
-  try {
-    const { timestamp, data } = JSON.parse(item);
-    const now = Date.now();
-    if (now - timestamp > maxAgeSeconds * 1000) {
-      return null;
-    }
-    return data as T;
-  } catch {
-    return null;
-  }
-};
-
-const setCachedData = (key: string, data: unknown) => {
-  localStorage.setItem(
-    key,
-    JSON.stringify({
-      timestamp: Date.now(),
-      data,
-    })
-  );
-};
+import { getCachedData, setCachedData } from '@/utils/cache';
 
 const route = useRoute();
 const id = route.params.id as string;
