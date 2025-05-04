@@ -15,6 +15,7 @@
         pattern="[0-9]*"
         placeholder="Enter your answer"
         class="w-full p-3 rounded bg-[#0d1117] border border-gray-700 mb-4 text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+        @keyup.enter="checkAnswer"
       />
 
       <div class="flex flex-col sm:flex-row justify-center gap-4">
