@@ -22,3 +22,5 @@ Real-time crypto prices, multilingual support, and clean scalable architecture �
 - 💬 Global language switcher (`useLanguage()` composable)
 - 📈 Live crypto ticker powered by CoinGecko API
 - 🧠 Modular, composable architecture with focus on scalability and performance
+- 🔐 Automatic asset hashing for optimized browser caching  
+- 🏷️ SEO-optimized homepage with `useHead()`
