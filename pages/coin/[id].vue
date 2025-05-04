@@ -70,6 +70,7 @@ import { useRoute } from "vue-router";
 import { ref, computed, onMounted } from "vue";
 import type { CoinDetails } from "@/types/crypto";
 import { getCachedData, setCachedData } from '@/utils/cache';
+import { useApi } from '@/composables/useApi';
 
 const route = useRoute();
 const id = route.params.id as string;
@@ -77,6 +78,8 @@ const id = route.params.id as string;
 const coin = ref<CoinDetails | null>(null);
 const pending = ref(true);
 const error = ref(false);
+
+const { fetchData } = useApi();
 
 const formattedDescription = computed(() => {
   if (!coin.value?.description?.en) return "";
@@ -96,20 +99,20 @@ const fetchCoinDetails = async () => {
     return;
   }
 
-  try {
-    const res = await fetch(`https://api.coingecko.com/api/v3/coins/${id}`);
-    if (!res.ok) {
-      throw new Error(`HTTP error! Status: ${res.status}`);
-    }
-    const data = await res.json();
-    coin.value = data;
-    setCachedData(cacheKey, data);
-  } catch (e) {
-    console.error("Failed to fetch coin details:", e);
+  const { data, error: fetchError, success } = await fetchData<CoinDetails>(
+    `https://api.coingecko.com/api/v3/coins/${id}`
+  );
+
+  if (!success || !data) {
+    console.error("Failed to fetch coin details:", fetchError);
     error.value = true;
-  } finally {
     pending.value = false;
+    return;
   }
+
+  coin.value = data;
+  setCachedData(cacheKey, data);
+  pending.value = false;
 };
 
 onMounted(fetchCoinDetails);

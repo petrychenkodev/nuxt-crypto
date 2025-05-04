@@ -27,16 +27,11 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { navigateTo } from "nuxt/app";
-import { useLanguage } from "@/composables/useLanguage";
-import { Coin, TrendingCoin } from "@/types/crypto";
 import HeroSection from "@/components/MainScreen/HeroSection.vue";
 import NftGallerySection from "@/components/MainScreen/NftGallerySection.vue";
 import TopCoinsSection from "@/components/MainScreen/TopCoinsSection.vue";
 import MarketOverviewSection from "@/components/MainScreen/MarketOverviewSection.vue";
 import { useCryptoData } from "@/composables/useCryptoData";
-import { heroTranslations } from "@/data/translations/hero";
-
-const { language } = useLanguage();
 
 const showModal = ref(false);
 const showHumanCheck = ref(false);

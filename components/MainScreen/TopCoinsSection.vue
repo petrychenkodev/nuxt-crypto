@@ -38,6 +38,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
 import { useLanguage } from "@/composables/useLanguage";
+import { useApi } from '@/composables/useApi';
 
 interface Coin {
   id: string;
@@ -49,25 +50,19 @@ interface Coin {
 
 const coins = ref<Coin[]>([]);
 
+const { fetchData } = useApi();
+
 const fetchTopCoins = async () => {
-  try {
-    const res = await $fetch<Coin[]>(
-      "https://api.coingecko.com/api/v3/coins/markets",
-      {
-        params: {
-          vs_currency: "usd",
-          ids: "bitcoin,ethereum,solana,dogecoin",
-          order: "market_cap_desc",
-          per_page: 4,
-          page: 1,
-          sparkline: false,
-        },
-      }
-    );
-    coins.value = res;
-  } catch (e) {
-    console.error("Failed to fetch top coins", e);
+  const { data, error, success } = await fetchData<Coin[]>(
+    "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum,solana,dogecoin&order=market_cap_desc&per_page=4&page=1&sparkline=false"
+  );
+
+  if (!success || !data) {
+    console.error("Failed to fetch top coins", error);
+    return;
   }
+
+  coins.value = data;
 };
 
 onMounted(fetchTopCoins);

@@ -18,6 +18,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
+import { useApi } from '@/composables/useApi';
 
 interface TrendingCoin {
   id: string;
@@ -29,23 +30,27 @@ interface TrendingCoin {
 
 const trendingCoins = ref<TrendingCoin[]>([]);
 
+const { fetchData } = useApi();
+
 const fetchTrendingCoins = async () => {
-  try {
-    const res = await $fetch<{ coins: { item: any }[] }>(
-      "https://api.coingecko.com/api/v3/search/trending"
-    );
-    trendingCoins.value = res.coins.map(
-      (coin): TrendingCoin => ({
-        id: coin.item.id,
-        name: coin.item.name,
-        symbol: coin.item.symbol,
-        thumb: coin.item.thumb,
-        market_cap_rank: coin.item.market_cap_rank,
-      })
-    );
-  } catch (e) {
-    console.error("Error fetching trending coins:", e);
+  const { data, error, success } = await fetchData<{ coins: { item: any }[] }>(
+    "https://api.coingecko.com/api/v3/search/trending"
+  );
+
+  if (!success || !data) {
+    console.error("Error fetching trending coins:", error);
+    return;
   }
+
+  trendingCoins.value = data.coins.map(
+    (coin): TrendingCoin => ({
+      id: coin.item.id,
+      name: coin.item.name,
+      symbol: coin.item.symbol,
+      thumb: coin.item.thumb,
+      market_cap_rank: coin.item.market_cap_rank,
+    })
+  );
 };
 
 onMounted(() => {

@@ -39,7 +39,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import axios from "axios";
+import { useApi } from '@/composables/useApi';
 
 const randomDescriptions = [
   "Playful Pup",
@@ -73,6 +73,8 @@ interface Dog {
 const dogData = ref<Dog[]>([]);
 const loading = ref(true);
 
+const { fetchData } = useApi();
+
 const fetchDogImages = async () => {
   const cached = getCachedData<Dog[]>("dogData", 300);
 
@@ -82,23 +84,28 @@ const fetchDogImages = async () => {
     return;
   }
 
-  try {
-    const res = await axios.get("https://dog.ceo/api/breeds/image/random/6");
-    dogData.value = res.data.message.map((img: string) => ({
-      image: img,
-      price: getRandomPrice(),
-      name: "Random Dog",
-      description: getRandomDescription(),
-    }));
+  const { data, error, success } = await fetchData<{ message: string[] }>(
+    "https://dog.ceo/api/breeds/image/random/6"
+  );
 
-    setCachedData("dogData", dogData.value);
-  } catch (err) {
+  if (!success || !data) {
     console.error(
-      "Too many requests. Please wait a moment and try again. This is a free API and has a request limit."
+      "Too many requests. Please wait a moment and try again. This is a free API and has a request limit.",
+      error
     );
-  } finally {
     loading.value = false;
+    return;
   }
+
+  dogData.value = data.message.map((img: string) => ({
+    image: img,
+    price: getRandomPrice(),
+    name: "Random Dog",
+    description: getRandomDescription(),
+  }));
+
+  setCachedData("dogData", dogData.value);
+  loading.value = false;
 };
 
 onMounted(fetchDogImages);

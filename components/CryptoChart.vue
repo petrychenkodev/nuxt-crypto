@@ -64,6 +64,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from "vue";
+import { useApi } from '@/composables/useApi';
 
 const props = defineProps<{
   coinId: string;
@@ -72,6 +73,7 @@ const props = defineProps<{
 
 const prices = ref<number[]>([]);
 const loading = ref(true);
+const { fetchData } = useApi();
 const width = 600;
 const height = 300;
 const yTicksCount = 6;
@@ -145,20 +147,22 @@ const fetchPrices = async () => {
     return;
   }
 
-  try {
-    const res = await fetch(
-      `https://api.coingecko.com/api/v3/coins/${props.coinId}/market_chart?vs_currency=usd&days=30`
-    );
-    const data = await res.json();
-    prices.value = (data.prices as [number, number][])
-      .map((p) => p[1])
-      .filter((p): p is number => typeof p === "number" && !isNaN(p));
-    setCachedData(cacheKey, prices.value);
-  } catch (e) {
-    console.error("Error loading prices:", e);
-  } finally {
+  const { data, error, success } = await fetchData<{ prices: [number, number][] }>(
+    `https://api.coingecko.com/api/v3/coins/${props.coinId}/market_chart?vs_currency=usd&days=30`
+  );
+
+  if (!success || !data) {
+    console.error("Error loading prices:", error);
     loading.value = false;
+    return;
   }
+
+  prices.value = data.prices
+    .map((p) => p[1])
+    .filter((p): p is number => typeof p === "number" && !isNaN(p));
+  setCachedData(cacheKey, prices.value);
+
+  loading.value = false;
 };
 
 onMounted(fetchPrices);

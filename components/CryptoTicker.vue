@@ -26,11 +26,12 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import axios from "axios";
 import { Coin } from "@/types/crypto";
 import { getCachedData, setCachedData } from "@/utils/cache";
+import { useApi } from "@/composables/useApi";
 
 const coins = ref<Coin[]>([]);
+const { fetchData } = useApi();
 const CACHE_KEY = "tickerCoins";
 const CACHE_DURATION_MS = 5 * 60 * 1000;
 
@@ -41,28 +42,17 @@ const fetchCryptoPrices = async () => {
     return;
   }
 
-  try {
-    const res = await axios.get(
-      "https://api.coingecko.com/api/v3/coins/markets",
-      {
-        params: {
-          vs_currency: "usd",
-          ids: "bitcoin,ethereum,solana,cardano,dogecoin,polkadot,tron,chainlink,uniswap,polygon",
-          order: "market_cap_desc",
-          per_page: 10,
-          page: 1,
-          sparkline: false,
-        },
-      }
-    );
-    coins.value = res.data;
-    await setCachedData(CACHE_KEY, res.data);
-  } catch (error) {
-    console.error(
-      "❌ Too many requests. Please wait and try again later.",
-      error
-    );
+  const { data, error, success } = await fetchData<Coin[]>(
+    "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum,solana,cardano,dogecoin,polkadot,tron,chainlink,uniswap,polygon&order=market_cap_desc&per_page=10&page=1&sparkline=false"
+  );
+
+  if (!success || !data) {
+    console.error("❌ Too many requests. Please wait and try again later.", error);
+    return;
   }
+
+  coins.value = data;
+  await setCachedData(CACHE_KEY, data);
 };
 
 onMounted(() => {

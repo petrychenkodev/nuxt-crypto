@@ -73,12 +73,15 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
+import { useApi } from '@/composables/useApi';
 import { Country } from "@/types/crypto";
 
 const countries = ref<Country[]>([]);
 const isLoading = ref(true);
 const searchQuery = ref("");
 const selectedStatus = ref("");
+
+const { fetchData } = useApi();
 
 const regulationStatus: Record<string, string> = {
   US: "Partially Legal",
@@ -107,20 +110,18 @@ const filteredCountries = computed(() => {
 });
 
 onMounted(async () => {
-  try {
-    const response = await fetch("https://restcountries.com/v3.1/all");
-    if (!response.ok) {
-      throw new Error(
-        "Too many requests. Please wait a moment and try again. This is a free API and has a request limit."
-      );
-    }
-    const data = await response.json();
-    countries.value = data;
-  } catch (error) {
+  const { data, error, success } = await fetchData<Country[]>(
+    "https://restcountries.com/v3.1/all"
+  );
+
+  if (!success || !data) {
     console.error("Error fetching countries:", error);
-  } finally {
     isLoading.value = false;
+    return;
   }
+
+  countries.value = data;
+  isLoading.value = false;
 });
 </script>
 
