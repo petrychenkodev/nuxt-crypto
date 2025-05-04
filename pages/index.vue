@@ -26,12 +26,24 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { navigateTo } from "nuxt/app";
+import { navigateTo, useHead } from "nuxt/app";
 import HeroSection from "@/components/MainScreen/HeroSection.vue";
 import NftGallerySection from "@/components/MainScreen/NftGallerySection.vue";
 import TopCoinsSection from "@/components/MainScreen/TopCoinsSection.vue";
 import MarketOverviewSection from "@/components/MainScreen/MarketOverviewSection.vue";
 import { useCryptoData } from "@/composables/useCryptoData";
+
+useHead({
+  title: 'Crypto Explorer — Your guide to the world of cryptocurrencies',
+  meta: [
+    { name: 'description', content: 'Discover the most popular cryptocurrencies, browse the NFT gallery, and track market trends — all in one place.' },
+    { property: 'og:title', content: 'Crypto Explorer — Your guide to the world of cryptocurrencies' },
+    { property: 'og:description', content: 'Stay updated on crypto trends, NFT collections, and top coins with Crypto Explorer.' },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:url', content: 'https://nuxt-crypto.netlify.app/' },
+    { property: 'og:image', content: 'https://nuxt-crypto.netlify.app/preview.jpg' }
+  ]
+})
 
 const showModal = ref(false);
 const showHumanCheck = ref(false);
